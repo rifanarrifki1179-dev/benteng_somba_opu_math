@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Drone — Benteng Somba Opu</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <style>
+    @keyframes pageEnter {
+      from {
+        opacity: 0;
+        transform: translateY(35px) scale(0.98);
+        filter: blur(3px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+        filter: blur(0);
+      }
+    }
+
+    @keyframes pageLeave {
+      from {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+        filter: blur(0);
+      }
+      to {
+        opacity: 0;
+        transform: translateY(-35px) scale(0.98);
+        filter: blur(3px);
+      }
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      min-height: 100vh;
+    }
+
+    body.menu-open {
+      overflow: hidden;
+    }
+
+    .page-transition {
+      animation: pageEnter 650ms ease both;
+    }
+
+    .page-transition.is-leaving {
+      animation: pageLeave 450ms ease both;
+    }
+
+    .page-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(24, 24, 27, 0);
+      pointer-events: none;
+      transition: background 450ms ease;
+      z-index: 9999;
+    }
+
+    .page-overlay.is-active {
+      background: rgba(24, 24, 27, 0.22);
+    }
+
+    .pressable {
+      transition: transform 180ms ease, box-shadow 180ms ease;
+    }
+
+    .pressable:active {
+      transform: scale(0.97);
+    }
+
+    .logo-box {
+      width: 54px;
+      height: 54px;
+      border-radius: 16px;
+      background: rgba(255, 255, 255, 0.88);
+      border: 1px solid rgba(245, 158, 11, 0.35);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 7px;
+      box-shadow: 0 8px 24px rgba(120, 53, 15, 0.12);
+      flex-shrink: 0;
+    }
+
+    .logo-box img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      display: block;
+    }
+
+    .menu-burger,
+    .menu-burger::before,
+    .menu-burger::after {
+      display: block;
+      width: 24px;
+      height: 3px;
+      border-radius: 999px;
+      background: #3f2a12;
+      transition: transform 300ms ease, opacity 300ms ease, background 300ms ease, top 300ms ease;
+    }
+
+    .menu-burger {
+      position: relative;
+    }
+
+    .menu-burger::before,
+    .menu-burger::after {
+      content: "";
+      position: absolute;
+      left: 0;
+    }
+
+    .menu-burger::before {
+      top: -8px;
+    }
+
+    .menu-burger::after {
+      top: 8px;
+    }
+
+    .menu-burger.active {
+      background: transparent;
+    }
+
+    .menu-burger.active::before {
+      top: 0;
+      transform: rotate(45deg);
+    }
+
+    .menu-burger.active::after {
+      top: 0;
+      transform: rotate(-45deg);
+    }
+
+    .side-menu {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 300px;
+      height: 100vh;
+      padding: 110px 24px 24px;
+      background: #f7f1e8;
+      border-right: 1px solid rgba(245, 158, 11, 0.35);
+      box-shadow: 20px 0 50px rgba(120, 53, 15, 0.12);
+      transform: translateX(-100%);
+      transition: transform 350ms ease;
+      z-index: 48;
+      overflow-y: auto;
+    }
+
+    .side-menu.open {
+      transform: translateX(0);
+    }
+
+    .menu-link {
+      display: block;
+      padding: 14px 16px;
+      border-radius: 14px;
+      transition: background 250ms ease, color 250ms ease, transform 250ms ease;
+    }
+
+    .menu-link:hover {
+      background: #fef3c7;
+      color: #92400e;
+      transform: translateX(4px);
+    }
+
+    .menu-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(24, 24, 27, 0);
+      pointer-events: none;
+      transition: background 350ms ease;
+      z-index: 40;
+    }
+
+    .menu-backdrop.open {
+      background: rgba(24, 24, 27, 0.22);
+      pointer-events: auto;
+    }
+
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: #92400e;
+      font-weight: 800;
+      transition: color 250ms ease, transform 250ms ease;
+    }
+
+    .back-link:hover {
+      color: #78350f;
+      transform: translateX(-4px);
+    }
+
+    .drone-card {
+      border-radius: 32px;
+      border: 1px solid rgba(245, 158, 11, 0.35);
+      background: rgba(255, 255, 255, 0.96);
+      box-shadow: 0 24px 70px rgba(120, 53, 15, 0.14);
+    }
+
+    .tag-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border-radius: 999px;
+      border: 1px solid rgba(180, 83, 9, 0.25);
+      background: #fef3c7;
+      padding: 7px 14px;
+      color: #92400e;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+    }
+
+    .divider-gradient {
+      height: 1px;
+      width: 100%;
+      background: linear-gradient(
+        to right,
+        transparent,
+        rgba(180, 83, 9, 0.45),
+        transparent
+      );
+    }
+
+    .video-wrap {
+      margin-top: 26px;
+      border-radius: 24px;
+      overflow: hidden;
+      border: 1px solid rgba(245, 158, 11, 0.45);
+      box-shadow:
+        0 20px 55px rgba(120, 53, 15, 0.18),
+        0 0 0 1px rgba(255, 255, 255, 0.65);
+      background: #000;
+    }
+
+    video {
+      display: block;
+      width: 100%;
+      height: auto;
+      background: #000;
+    }
+
+    .info-card {
+      border-radius: 24px;
+      border: 1px solid rgba(245, 158, 11, 0.28);
+      background: #fffaf3;
+      box-shadow: 0 14px 34px rgba(120, 53, 15, 0.08);
+      transition: transform 300ms ease, box-shadow 300ms ease;
+    }
+
+    .info-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 22px 48px rgba(120, 53, 15, 0.15);
+    }
+
+    .cta-link {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 14px;
+      background: #b45309;
+      padding: 10px 18px;
+      font-size: 14px;
+      font-weight: 800;
+      color: white;
+      transition: background 250ms ease, transform 250ms ease, box-shadow 250ms ease;
+      box-shadow: 0 10px 24px rgba(180, 83, 9, 0.20);
+      text-decoration: none;
+    }
+
+    .cta-link:hover {
+      background: #92400e;
+      transform: translateY(-2px);
+      box-shadow: 0 16px 32px rgba(120, 53, 15, 0.25);
+    }
+
+    main p {
+      text-align: justify;
+      text-justify: inter-word;
+    }
+
+    @media (max-width: 640px) {
+      .side-menu {
+        width: 260px;
+        padding: 105px 20px 24px;
+      }
+
+      .logo-box {
+        width: 48px;
+        height: 48px;
+      }
+    }
+
+    @media (max-width: 420px) {
+      header .logo-box {
+        width: 42px;
+        height: 42px;
+        border-radius: 13px;
+      }
+    }
+  </style>
+</head>
+
+<body class="bg-[#f7f1e8] text-zinc-800 antialiased page-transition">
+
+  <!-- NAVBAR -->
+  <header class="sticky top-0 z-50 border-b border-amber-200/70 bg-[#f7f1e8]/95 backdrop-blur-md shadow-sm">
+    <div class="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8 py-3 flex items-center justify-between gap-5">
+
+      <div class="flex items-center gap-4 min-w-0">
+        <button
+          id="menuBtn"
+          type="button"
+          class="pressable inline-flex h-11 w-11 items-center justify-center rounded-xl border border-amber-200 bg-white/85 text-zinc-800 shadow-sm hover:bg-amber-100 transition relative z-50 flex-shrink-0"
+          aria-label="Buka menu"
+        >
+          <span id="menuIcon" class="menu-burger" aria-hidden="true"></span>
+        </button>
+
+        <div class="min-w-0">
+          <h1 class="text-base sm:text-xl font-extrabold text-zinc-900 leading-tight truncate">
+            Benteng Somba Opu
+          </h1>
+          <p class="text-[10px] sm:text-xs tracking-[0.2em] text-amber-700 uppercase truncate">
+            Website Rumah Adat
+          </p>
+        </div>
+      </div>
+
+      <div class="logo-box">
+        <img src="assets/photos/logo.png" alt="Logo Benteng Somba Opu">
+      </div>
+
+    </div>
+  </header>
+
+  <!-- SIDE MENU -->
+  <div id="menuBackdrop" class="menu-backdrop"></div>
+
+  <aside id="mobileMenu" class="side-menu">
+    <nav class="flex flex-col gap-3 text-sm font-semibold text-zinc-700">
+      <a href="mainmenu.html" class="menu-link">Beranda</a>
+      <a href="mainmenu.html#daftar-rumah" class="menu-link">Jelajah Kawasan</a>
+      <a href="mainmenu.html#tentang" class="menu-link">Tentang Website</a>
+      <a href="about.html" class="menu-link">Informasi Benteng Somba Opu</a>
+      <a href="drone.html" class="menu-link">Video Drone Benteng Somba Opu</a>
+    </nav>
+  </aside>
+
+  <!-- CONTENT -->
+  <main class="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8 py-10 sm:py-14">
+
+    <a href="mainmenu.html" class="back-link mb-7">
+      <span class="text-lg">←</span>
+      <span>Kembali ke Beranda</span>
+    </a>
+
+    <section class="drone-card p-6 sm:p-8 lg:p-10">
+      <header class="mb-6">
+        <div class="tag-pill mb-5">
+          <span class="inline-flex h-2 w-2 rounded-full bg-amber-700"></span>
+          Benteng Somba Opu · Drone View
+        </div>
+
+        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-zinc-900 leading-tight mb-4">
+          Video Drone
+          <span class="text-amber-700">Benteng Somba Opu</span>
+        </h2>
+
+        <p class="text-zinc-600 leading-7 sm:leading-8 max-w-3xl">
+          Rekaman ini mendokumentasikan perjalanan udara yang dimulai dari ruas jalan menuju kawasan
+          Benteng Somba Opu, kemudian perlahan memasuki area kompleks hingga akhirnya menampilkan
+          sudut pandang dari atas benteng. Melalui alur ini, penonton dapat merasakan transisi dari
+          akses masuk menuju pusat kawasan bersejarah Somba Opu.
+        </p>
+      </header>
+
+      <div class="divider-gradient mb-8"></div>
+
+      <!-- VIDEO -->
+      <div class="video-wrap">
+        <video controls poster="assets/photos/drone_poster.jpg">
+          <source src="assets/videodrone/Video_drone_benteng.mp4" type="video/mp4">
+          Browser Anda tidak mendukung video. Silakan gunakan browser yang lebih baru.
+        </video>
+      </div>
+
+      <p class="mt-4 text-sm text-zinc-600 leading-7">
+        <span class="font-bold text-amber-800">Catatan visual:</span>
+        tayangan dimulai dari perspektif rendah di sepanjang jalan menuju Benteng Somba Opu,
+        lalu berlanjut menyusuri kawasan hingga kamera terangkat tinggi dan berhenti pada sudut
+        pandang di atas benteng untuk menampilkan keseluruhan areanya.
+      </p>
+
+      <!-- INFO CARDS -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-5 mt-8">
+        <div class="info-card p-5 sm:p-6">
+          <p class="text-xs font-extrabold uppercase tracking-[0.18em] text-amber-700 mb-3">
+            Sudut Pandang
+          </p>
+
+          <h3 class="text-xl font-extrabold text-zinc-900 mb-3">
+            Dari Akses Jalan ke Pusat Benteng
+          </h3>
+
+          <p class="text-sm text-zinc-600 leading-7">
+            Pergerakan drone dari jalan menuju kawasan Somba Opu membantu menggambarkan bagaimana
+            pengunjung memasuki area ini secara nyata: mulai dari jalur akses luar, memasuki kompleks,
+            hingga tiba di area utama benteng yang menjadi titik fokus rekaman.
+          </p>
+        </div>
+
+        <div class="info-card p-5 sm:p-6">
+            <p class="text-xs font-extrabold uppercase tracking-[0.18em] text-amber-700 mb-3">
+                Keterhubungan
+            </p>
+
+            <h3 class="text-xl font-extrabold text-zinc-900 mb-3">
+                Menghubungkan Rute Nyata dan Jelajah Rumah Adat
+            </h3>
+
+            <p class="text-sm text-zinc-600 leading-7 mb-5">
+                Urutan visual dalam video dapat digunakan sebagai orientasi awal sebelum pengunjung menjelajahi
+                daftar rumah adat melalui pilihan kartu yang tersedia. Dengan melihat alur kawasan dari udara,
+                pengunjung dapat membayangkan posisi, suasana, dan keterhubungan antarbangunan sebelum memilih
+                rumah adat tertentu untuk dipelajari secara lebih mendalam.
+            </p>
+
+            <a href="mainmenu.html#daftar-rumah" class="cta-link">
+                ⤺ Kembali ke Jelajah Rumah Adat
+            </a>
+            </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="mt-20 bg-zinc-900 text-zinc-300">
+    <div class="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8 py-8 flex flex-col md:flex-row justify-between gap-3 text-sm">
+      <p>© 2025 · Website Interaktif Benteng Somba Opu</p>
+
+      <p>
+        <a
+          href="https://rifanarrifki1179-dev.github.io/benteng_somba_opu/"
+          target="_blank"
+          class="text-amber-400 hover:text-amber-300 underline underline-offset-4 transition"
+        >
+          benteng somba opu
+        </a>
+      </p>
+    </div>
+  </footer>
+
+  <div id="pageOverlay" class="page-overlay"></div>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const body = document.body;
+      const overlay = document.getElementById("pageOverlay");
+
+      const menuBtn = document.getElementById("menuBtn");
+      const menuIcon = document.getElementById("menuIcon");
+      const mobileMenu = document.getElementById("mobileMenu");
+      const menuBackdrop = document.getElementById("menuBackdrop");
+
+      function closeMenu() {
+        if (!mobileMenu || !menuBackdrop || !menuIcon) return;
+
+        mobileMenu.classList.remove("open");
+        menuBackdrop.classList.remove("open");
+        body.classList.remove("menu-open");
+        menuIcon.classList.remove("active");
+      }
+
+      if (menuBtn && mobileMenu && menuIcon && menuBackdrop) {
+        menuBtn.addEventListener("click", (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+
+          mobileMenu.classList.toggle("open");
+          menuBackdrop.classList.toggle("open");
+          body.classList.toggle("menu-open");
+          menuIcon.classList.toggle("active");
+        });
+
+        menuBackdrop.addEventListener("click", closeMenu);
+
+        document.querySelectorAll(".menu-link").forEach(link => {
+          link.addEventListener("click", closeMenu);
+        });
+      }
+
+      const links = document.querySelectorAll('a[href]:not([href^="#"]):not([target="_blank"])');
+
+      links.forEach(link => {
+        link.addEventListener("click", function (e) {
+          const href = this.getAttribute("href");
+
+          if (!href || href === "#" || href.startsWith("javascript:")) return;
+
+          e.preventDefault();
+
+          body.classList.add("is-leaving");
+
+          if (overlay) {
+            overlay.classList.add("is-active");
+          }
+
+          setTimeout(() => {
+            window.location.href = href;
+          }, 420);
+        });
+      });
+
+      window.addEventListener("pageshow", () => {
+        body.classList.remove("is-leaving");
+        body.classList.remove("menu-open");
+
+        if (overlay) {
+          overlay.classList.remove("is-active");
+        }
+
+        if (menuIcon) {
+          menuIcon.classList.remove("active");
+        }
+      });
+    });
+  </script>
+
+</body>
+</html>

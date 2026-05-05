@@ -1,0 +1,1357 @@
+﻿<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Benteng Somba Opu - Main Menu</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <style>
+    @keyframes pageEnter {
+      from {
+        opacity: 0;
+        transform: translateY(35px) scale(0.98);
+        filter: blur(3px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+        filter: blur(0);
+      }
+    }
+
+    @keyframes pageLeave {
+      from {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+        filter: blur(0);
+      }
+      to {
+        opacity: 0;
+        transform: translateY(-35px) scale(0.98);
+        filter: blur(3px);
+      }
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      min-height: 100vh;
+    }
+
+    body.menu-open {
+      overflow: hidden;
+    }
+
+    .page-transition {
+      animation: pageEnter 650ms ease both;
+    }
+
+    .page-transition.is-leaving {
+      animation: pageLeave 450ms ease both;
+    }
+
+    .page-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(24, 24, 27, 0);
+      pointer-events: none;
+      transition: background 450ms ease;
+      z-index: 9999;
+    }
+
+    .page-overlay.is-active {
+      background: rgba(24, 24, 27, 0.22);
+    }
+
+    .pressable {
+      transition: transform 180ms ease, box-shadow 180ms ease;
+    }
+
+    .pressable:active {
+      transform: scale(0.97);
+    }
+
+    .logo-box {
+      width: 54px;
+      height: 54px;
+      border-radius: 16px;
+      background: rgba(255, 255, 255, 0.88);
+      border: 1px solid rgba(245, 158, 11, 0.35);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 7px;
+      box-shadow: 0 8px 24px rgba(120, 53, 15, 0.12);
+      flex-shrink: 0;
+    }
+
+    .logo-box img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      display: block;
+    }
+
+    .menu-burger,
+    .menu-burger::before,
+    .menu-burger::after {
+      display: block;
+      width: 24px;
+      height: 3px;
+      border-radius: 999px;
+      background: #3f2a12;
+      transition: transform 300ms ease, opacity 300ms ease, background 300ms ease, top 300ms ease;
+    }
+
+    .menu-burger {
+      position: relative;
+    }
+
+    .menu-burger::before,
+    .menu-burger::after {
+      content: "";
+      position: absolute;
+      left: 0;
+    }
+
+    .menu-burger::before {
+      top: -8px;
+    }
+
+    .menu-burger::after {
+      top: 8px;
+    }
+
+    .menu-burger.active {
+      background: transparent;
+    }
+
+    .menu-burger.active::before {
+      top: 0;
+      transform: rotate(45deg);
+    }
+
+    .menu-burger.active::after {
+      top: 0;
+      transform: rotate(-45deg);
+    }
+
+    .side-menu {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 300px;
+      height: 100vh;
+      padding: 110px 24px 24px;
+      background: #f7f1e8;
+      border-right: 1px solid rgba(245, 158, 11, 0.35);
+      box-shadow: 20px 0 50px rgba(120, 53, 15, 0.12);
+      transform: translateX(-100%);
+      transition: transform 350ms ease;
+      z-index: 48;
+      overflow-y: auto;
+    }
+
+    .side-menu.open {
+      transform: translateX(0);
+    }
+
+    .menu-link {
+      display: block;
+      padding: 14px 16px;
+      border-radius: 14px;
+      transition: background 250ms ease, color 250ms ease, transform 250ms ease;
+    }
+
+    .menu-link:hover {
+      background: #fef3c7;
+      color: #92400e;
+      transform: translateX(4px);
+    }
+
+    .menu-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(24, 24, 27, 0);
+      pointer-events: none;
+      transition: background 350ms ease;
+      z-index: 40;
+    }
+
+    .menu-backdrop.open {
+      background: rgba(24, 24, 27, 0.22);
+      pointer-events: auto;
+    }
+
+    .house-card {
+      position: relative;
+      overflow: hidden;
+      border-radius: 28px;
+      border: 1px solid rgba(245, 158, 11, 0.35);
+      background: rgba(255, 255, 255, 0.94);
+      box-shadow: 0 18px 45px rgba(120, 53, 15, 0.10);
+      transition: transform 350ms ease, box-shadow 350ms ease, border-color 350ms ease;
+    }
+
+    .house-card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 28px 70px rgba(120, 53, 15, 0.22);
+      border-color: #b45309;
+    }
+
+    .house-card img {
+      width: 100%;
+      height: 190px;
+      object-fit: cover;
+      display: block;
+      transition: transform 500ms ease;
+    }
+
+    .house-card:hover img {
+      transform: scale(1.08);
+    }
+
+    .house-card a {
+      text-decoration: none;
+    }
+
+    .status-badge {
+      position: absolute;
+      top: 14px;
+      right: 14px;
+      z-index: 2;
+      border-radius: 999px;
+      padding: 6px 11px;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      backdrop-filter: blur(8px);
+      display: none !important;
+    }
+
+    .status-ready {
+      background: rgba(22, 163, 74, 0.92);
+      color: white;
+    }
+
+    .status-progress {
+      background: rgba(245, 158, 11, 0.95);
+      color: white;
+    }
+
+    .enter-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 14px;
+      background: #b45309;
+      padding: 10px 18px;
+      font-size: 14px;
+      font-weight: 800;
+      color: white;
+      transition: background 250ms ease, transform 250ms ease, box-shadow 250ms ease;
+      box-shadow: 0 10px 24px rgba(180, 83, 9, 0.20);
+    }
+
+    .enter-btn:hover {
+      background: #92400e;
+      transform: translateY(-2px);
+      box-shadow: 0 16px 32px rgba(120, 53, 15, 0.25);
+    }
+
+        @keyframes sectionSlideFocus {
+      from {
+        opacity: 0.4;
+        transform: translateY(45px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .section-slide-active {
+      animation: sectionSlideFocus 650ms ease both;
+    }
+
+    @media (max-width: 640px) {
+      .side-menu {
+        width: 260px;
+        padding: 105px 20px 24px;
+      }
+
+      .house-card img {
+        height: 165px;
+      }
+
+      .logo-box {
+        width: 48px;
+        height: 48px;
+      }
+    }
+
+    @media (max-width: 420px) {
+      header .logo-box {
+        width: 42px;
+        height: 42px;
+        border-radius: 13px;
+      }
+    }
+
+/* ===== MINIMAP CONTAINER ===== */
+.minimap-card {
+  border-radius: 32px;
+  border: 1px solid rgba(245, 158, 11, 0.35);
+  background: rgba(255, 255, 255, 0.96);
+  box-shadow: 0 24px 70px rgba(120, 53, 15, 0.14);
+  overflow: hidden;
+}
+
+.minimap-area {
+  position: relative;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+/* ===== WINDOW ===== */
+.minimap-window {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  border-radius: 26px;
+  border: 1px solid rgba(245, 158, 11, 0.45);
+  background: #111;
+  box-shadow: 0 18px 45px rgba(120, 53, 15, 0.16);
+  z-index: 1;
+}
+
+.minimap-track {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  transition: transform 900ms cubic-bezier(.22, 1, .36, 1);
+}
+
+.minimap-slide {
+  min-width: 100%;
+  width: 100%;
+  height: 100%;
+  flex-shrink: 0;
+  position: relative;
+}
+
+.minimap-slide img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* ===== TOMBOL PANAH ===== */
+.map-arrow {
+  position: absolute;
+  z-index: 10;
+  width: 46px;
+  height: 46px;
+  border-radius: 999px;
+  border: 1px solid rgba(245, 158, 11, 0.55);
+  background: #fffaf3;
+  color: #92400e;
+  font-size: 24px;
+  font-weight: 900;
+  box-shadow: 0 12px 28px rgba(120, 53, 15, 0.18);
+  cursor: pointer;
+  transition: all 250ms ease;
+}
+
+.map-arrow:hover {
+  background: #b45309;
+  color: white;
+  transform: scale(1.08);
+}
+
+.map-arrow:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* posisi kiri kanan */
+.map-arrow.left {
+  left: -23px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.map-arrow.right {
+  right: -23px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+/* ===== LABEL POSISI ===== */
+.minimap-position {
+  margin-top: 26px;
+  text-align: center;
+  font-size: 13px;
+  font-weight: 800;
+  color: #92400e;
+}
+
+/* ===== PROGRESS BAR ===== */
+.minimap-progress {
+  margin: 14px auto 0;
+  width: min(360px, 85%);
+  height: 8px;
+  border-radius: 999px;
+  background: #fde68a;
+  overflow: hidden;
+}
+
+.minimap-progress-bar {
+  width: 33.3333%;
+  height: 100%;
+  border-radius: 999px;
+  background: #b45309;
+  transition: transform 900ms cubic-bezier(.22, 1, .36, 1);
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+  .map-arrow {
+    width: 40px;
+    height: 40px;
+    font-size: 21px;
+  }
+
+  .map-arrow.left {
+    left: -14px;
+  }
+
+  .map-arrow.right {
+    right: -14px;
+  }
+}  
+
+/* ===== HOTSPOT (TOMBOL DI ATAS MAP) ===== */
+/* ===== HOTSPOT BARU (GANTI TOTAL) ===== */
+.hotspot {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  z-index: 8;
+  text-decoration: none;
+}
+
+.hotspot .icon {
+  width: 48px;
+  height: 48px;
+  background: rgba(180, 83, 9, 0.18); /* warna coklat transparan */
+  border: 2px solid #b45309; /* garis coklat */
+  backdrop-filter: blur(6px);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow:
+    0 0 12px rgba(180, 83, 9, 0.9),
+    0 0 25px rgba(180, 83, 9, 0.45);
+  transition: transform 0.22s ease, box-shadow 0.22s ease;
+  animation: hotspot-pulse 2.2s ease-in-out infinite;
+}
+
+.hotspot .icon img {
+  width: 28px;
+  height: 28px;
+  object-fit: contain;
+}
+
+.hotspot:hover .icon {
+  transform: scale(1.12);
+  box-shadow:
+    0 0 18px rgba(180, 83, 9, 1),
+    0 0 40px rgba(120, 53, 15, 0.6);
+  animation-play-state: paused;
+}
+
+@keyframes hotspot-pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.06); }
+  100% { transform: scale(1); }
+}
+
+.hotspot .label {
+  display: none;
+  margin-top: 10px;
+  background: rgba(0,0,0,0.75);
+  padding: 6px 12px;
+  border-radius: 10px;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.hotspot:hover .label {
+  display: block;
+}
+</style>
+</head>
+
+<body class="bg-[#f7f1e8] text-zinc-800 antialiased page-transition">
+
+  <header class="sticky top-0 z-50 border-b border-amber-200/70 bg-[#f7f1e8]/95 backdrop-blur-md shadow-sm">
+    <div class="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8 py-3 flex items-center justify-between gap-5">
+
+      <div class="flex items-center gap-4 min-w-0">
+        <button
+          id="menuBtn"
+          type="button"
+          class="pressable inline-flex h-11 w-11 items-center justify-center rounded-xl border border-amber-200 bg-white/85 text-zinc-800 shadow-sm hover:bg-amber-100 transition relative z-50 flex-shrink-0"
+          aria-label="Buka menu"
+        >
+          <span id="menuIcon" class="menu-burger" aria-hidden="true"></span>
+        </button>
+
+        <div class="min-w-0">
+          <h1 class="text-base sm:text-xl font-extrabold text-zinc-900 leading-tight truncate">
+            Benteng Somba Opu
+          </h1>
+          <p class="text-[10px] sm:text-xs tracking-[0.2em] text-amber-700 uppercase truncate">
+            Website Rumah Adat
+          </p>
+        </div>
+      </div>
+
+      <div class="logo-box">
+        <img src="assets/photos/logo.png" alt="Logo Benteng Somba Opu">
+      </div>
+
+    </div>
+  </header>
+
+  <div id="menuBackdrop" class="menu-backdrop"></div>
+
+  <aside id="mobileMenu" class="side-menu">
+    <nav class="flex flex-col gap-3 text-sm font-semibold text-zinc-700">
+      <a href="mainmenu.html" class="menu-link">Beranda</a>
+      <a href="#daftar-rumah" class="menu-link scroll-to-section">Jelajah Kawasan</a>
+      <a href="#tentang" class="menu-link scroll-to-section">Tentang Website</a>
+      <a href="about.html" class="menu-link">Informasi Benteng Somba Opu</a>
+      <a href="drone.html" class="menu-link">Video Drone Benteng Somba Opu</a>
+    </nav>
+  </aside>
+
+  <section class="relative min-h-[88vh] flex items-center overflow-hidden">
+    <img
+      src="assets/photos/benteng_atas.jpeg"
+      alt="Benteng Somba Opu"
+      class="absolute inset-0 h-full w-full object-cover scale-105"
+    />
+
+    <div class="absolute inset-0 bg-gradient-to-b from-black/65 via-black/55 to-black/75"></div>
+
+    <div class="relative max-w-7xl mx-auto px-5 sm:px-6 lg:px-8 w-full">
+      <div class="max-w-4xl mx-auto text-center text-white py-20">
+        <span class="inline-flex items-center rounded-full border border-amber-300/70 bg-black/10 px-5 py-2 text-xs sm:text-sm uppercase tracking-[0.2em] text-amber-200 shadow-lg mb-6">
+          KAWASAN BUDAYA & EDUKASI DIGITAL
+        </span>
+
+        <h2 class="text-4xl sm:text-5xl lg:text-6xl font-bold leading-tight tracking-tight mb-6">
+          Eksplorasi Rumah Adat Benteng Somba Opu
+        </h2>
+
+        <p class="max-w-3xl mx-auto text-sm sm:text-base lg:text-lg text-stone-200 leading-7 sm:leading-8 mb-8 text-justify">
+          Selamat datang di situs bersejarah Benteng Somba Opu, salah satu pusat penting aktivitas pemerintahan dan perdagangan Kerajaan Gowa pada abad ke-17. Sebagai kawasan strategis yang pernah menjadi gerbang maritim di Timur Nusantara, Benteng Somba Opu kini menjadi ruang pelestarian budaya yang menampilkan beragam Rumah Adat dari etnis-etnis di Sulawesi Selatan. Silakan gunakan peta interaktif dan pilih Rumah Adat yang ada di bawah untuk memulai tur dan menjelajahi setiap Rumah Adat secara lebih mendalam.
+        </p>
+      </div>
+    </div>
+  </section>
+
+    <section class="relative -mt-16 z-10 max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
+  <div class="rounded-[32px] border border-amber-200/80 bg-white/95 backdrop-blur-md shadow-2xl shadow-amber-900/10 p-6 sm:p-8">
+
+    <div class="text-center max-w-3xl mx-auto mb-8">
+
+      <h3 class="text-2xl sm:text-3xl font-extrabold text-zinc-900 mb-3">
+        Masuki Dunia Benteng Somba Opu
+      </h3>
+      <p class="text-zinc-500 leading-6 text-xs sm:text-sm max-w-xl mx-auto">
+        Jelajahi setiap sudutnya, pahami ceritanya, dan lihat keindahannya dari sudut pandang yang belum pernah kamu rasakan sebelumnya.
+      </p>
+    </div>
+    <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
+
+      <!-- CARD 1 -->
+      <div class="relative overflow-hidden rounded-[26px] border border-amber-100 bg-white p-6 shadow-lg transition hover:-translate-y-2 hover:shadow-xl group">
+        
+        <span class="absolute right-4 bottom-4 text-7xl opacity-10 pointer-events-none">
+          🏠
+        </span>
+
+        <h4 class="text-xl font-extrabold text-zinc-900 mb-3">
+          Jelajah Kawasan
+        </h4>
+
+        <p class="text-sm text-zinc-600 leading-7 mb-6 text-justify">          
+          Telusuri rumah etnis, museum, bangunan custom, dan rumah adat yang menjadi bagian dari kawasan Benteng Somba Opu.        
+        </p>
+
+        <a href="#daftar-rumah"
+          class="inline-flex items-center justify-center self-start rounded-xl bg-amber-700 px-5 py-2.5 text-sm font-bold text-white hover:bg-amber-800 transition scroll-to-section">
+          Masuk →
+        </a>
+      </div>
+
+      <!-- CARD 2 -->
+        <div class="relative overflow-hidden rounded-[26px] border border-amber-100 bg-white p-6 shadow-lg transition hover:-translate-y-2 hover:shadow-xl flex flex-col justify-between h-full">        
+        <span class="absolute right-4 bottom-4 text-7xl opacity-10 pointer-events-none">
+          ℹ️
+        </span>
+
+        <h4 class="text-xl font-extrabold text-zinc-900 mb-3">
+          Informasi Benteng
+        </h4>
+
+        <p class="text-sm text-zinc-600 leading-7 mb-6 text-justify">
+            Pelajari sejarah dan fungsi Benteng Somba Opu.
+        </p>
+
+        <a href="about.html"
+           class="inline-flex items-center justify-center self-start rounded-xl bg-amber-700 px-5 py-2.5 text-sm font-bold text-white hover:bg-amber-800 transition">
+          Lihat →
+        </a>
+      </div>
+
+      <!-- CARD 3 -->
+        <div class="relative overflow-hidden rounded-[26px] border border-amber-100 bg-white p-6 shadow-lg transition hover:-translate-y-2 hover:shadow-xl flex flex-col justify-between h-full">        
+        <span class="absolute right-4 bottom-4 text-7xl opacity-10 pointer-events-none">
+          🎥
+        </span>
+
+        <h4 class="text-xl font-extrabold text-zinc-900 mb-3">
+          Video Drone
+        </h4>
+
+        <p class="text-sm text-zinc-600 leading-7 mb-6 text-justify">
+          Lihat tampilan udara kawasan Benteng Somba Opu.
+        </p>
+
+        <a href="drone.html"
+           class="inline-flex items-center justify-center self-start rounded-xl bg-amber-700 px-5 py-2.5 text-sm font-bold text-white hover:bg-amber-800 transition">
+          Tonton →
+        </a>
+      </div>
+
+      <!-- CARD 4 -->
+        <div class="relative overflow-hidden rounded-[26px] border border-amber-100 bg-white p-6 shadow-lg transition hover:-translate-y-2 hover:shadow-xl flex flex-col justify-between h-full">        
+        <span class="absolute right-4 bottom-4 text-7xl opacity-10 pointer-events-none">
+          ✨
+        </span>
+
+        <h4 class="text-xl font-extrabold text-zinc-900 mb-3">
+          Tentang Website
+        </h4>
+
+        <p class="text-sm text-zinc-600 leading-7 mb-6 text-justify">
+            Penjelasan fungsi website sebagai media pembelajaran.
+        </p>
+
+        <a href="#tentang"
+           class="inline-flex items-center justify-center self-start rounded-xl bg-amber-700 px-5 py-2.5 text-sm font-bold text-white hover:bg-amber-800 transition scroll-to-section">
+          Lihat →
+        </a>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<section id="minimap" class="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8 mt-14">
+  <div class="minimap-card p-6 sm:p-8">
+    <div class="text-center max-w-3xl mx-auto mb-8">
+      <p class="text-sm uppercase tracking-[0.25em] text-amber-700 mb-3">
+        Minimap Kawasan
+      </p>
+
+      <h3 class="text-2xl sm:text-3xl font-extrabold text-zinc-900 mb-3">
+        Peta Mini Jelajah Benteng Somba Opu
+      </h3>
+
+      <p class="text-zinc-600 leading-7 text-sm sm:text-base text-justify">
+        Minimap ini menampilkan kawasan Benteng Somba Opu dalam bentuk peta memanjang.
+        Gunakan tombol kiri dan kanan untuk menggeser tampilan peta secara bertahap.
+      </p>
+    </div>
+
+    <div class="minimap-area">
+      <button id="mapLeft" class="map-arrow left" type="button">←</button>
+      <button id="mapRight" class="map-arrow right" type="button">→</button>
+
+      <div class="minimap-window">
+        <div id="minimapTrack" class="minimap-track">
+          <div class="minimap-slide">
+          <img src="assets/photos/map1.jpeg" alt="Minimap bagian 1">
+            <a href="https://rifanarrifki1179-dev.github.io/balla_labbirina_ujung_pandang/index3.html" class="hotspot" style="top: 44%; left: 37%;">
+              <div class="icon">
+                <img src="assets/icons/ujung_pandang.png" alt="Ikon Ujung Pandang">
+              </div>
+              <div class="label">Balla Labbirinna</div>
+            </a>
+
+            <a href="https://rifanarrifki1179-dev.github.io/rumah_adat_mamuju/" class="hotspot" style="top: 24%; left: 50%;">
+              <div class="icon">
+                <img src="assets/icons/mamuju.png" alt="Ikon Mamuju">
+              </div>
+              <div class="label">Rumah Adat Mamuju</div>
+            </a>
+
+            <a href="https://rifanarrifki1179-dev.github.io/Rumah-Adat-Majene/" class="hotspot" style="top: 34%; left: 60%;">
+              <div class="icon">
+                <img src="assets/icons/majene.png" alt="Ikon Majene">
+              </div>
+              <div class="label">Rumah Adat Majene</div>
+            </a>
+
+            <a href="https://rifanarrifki1179-dev.github.io/rumah_adat_boyang_mandar/" class="hotspot" style="top: 58%; left: 65%;">
+              <div class="icon">
+                <img src="assets/icons/ikon_mandar.png" alt="Ikon Mandar">
+              </div>
+              <div class="label">Rumah Adat Mandar</div>
+            </a>
+
+            <a href="https://rifanarrifki1179-dev.github.io/rumahadatkajang_bulukumba/" class="hotspot" style="top: 90%; left: 55%;">
+              <div class="icon">
+                <img src="assets/icons/ikon_kajang.png" alt="Ikon Kajang">
+              </div>
+              <div class="label">Rumah Adat Kajang</div>
+            </a>
+          </div>
+
+          <div class="minimap-slide">
+            <img src="assets/photos/map2.jpeg" alt="Minimap bagian 2">
+
+            <a href="https://rifanarrifki1179-dev.github.io/rumah_adat_bugis/" class="hotspot" style="top: 50%; left: 80%;">
+              <div class="icon">
+                <img src="assets/icons/ikon_bugis.png" alt="Ikon Bugis">
+              </div>
+              <div class="label">Rumah Adat Bugis</div>
+            </a>
+
+            <a href="https://rifanarrifki1179-dev.github.io/rumah_adat_bulukumba/" class="hotspot" style="top: 39%; left: 48%;">
+              <div class="icon">
+                <img src="assets/icons/bulukumba.png" alt="Ikon Bulukumba">
+              </div>
+              <div class="label">Rumah Adat Bulukumba</div>
+            </a>
+
+            <a href="https://rifanarrifki1179-dev.github.io/Rumah_Tradisional_Luwu/" class="hotspot" style="top: 32%; left: 61%;">
+              <div class="icon">
+                <img src="assets/icons/luwu.png" alt="Ikon Luwu">
+              </div>
+              <div class="label">Rumah Adat Luwu</div>
+            </a>
+
+            <a href="https://rifanarrifki1179-dev.github.io/rumah_adat_toraja/" class="hotspot" style="top: 70%; left: 73%;">
+              <div class="icon">
+                <img src="assets/icons/ikon_rumah.png" alt="Ikon Toraja">
+              </div>
+              <div class="label">Rumah Adat Toraja</div>
+            </a>
+
+            <a href="https://rifanarrifki1179-dev.github.io/rumah_tradisional_baruga/" class="hotspot" style="top: 75%; left: 33%;">
+              <div class="icon">
+                <img src="assets/icons/ikon_baruga.png" alt="Ikon Baruga">
+              </div>
+              <div class="label">Baruga Somba Opu</div>
+            </a>
+
+            <a href="https://rifanarrifki1179-dev.github.io/museum_karaeng_pattingngalloang/" class="hotspot" style="top: 65%; left: 5%;">
+              <div class="icon">
+                <img src="assets/icons/museum.png" alt="Ikon Museum">
+              </div>
+              <div class="label">Museum Karaeng Pattingngalloang</div>
+            </a>
+
+          </div>
+
+          <div class="minimap-slide">
+            <img src="assets/photos/map3.jpeg" alt="Minimap bagian 3">
+
+            <a href="https://rifanarrifki1179-dev.github.io/rumah_adat_takalar/" class="hotspot" style="top: 22%; left: 44%;">
+              <div class="icon">
+                <img src="assets/icons/takalar.png" alt="Ikon Takalar">
+              </div>
+              <div class="label">Rumah Adat Takalar</div>
+            </a>
+
+            <a href="https://rifanarrifki1179-dev.github.io/rumah_adat_barru/" class="hotspot" style="top: 35%; left: 60%;">
+              <div class="icon">
+                <img src="assets/icons/barru.png" alt="Ikon Barru">
+              </div>
+              <div class="label">Rumah Adat Barru</div>
+            </a>
+
+            <a href="https://rifanarrifki1179-dev.github.io/rumah_tradisional_selayar/" class="hotspot" style="top: 35%; left: 40%;">
+              <div class="icon">
+                <img src="assets/icons/selayar.png" alt="Ikon Selayar">
+              </div>
+              <div class="label">Rumah Adat Selayar</div>
+            </a>
+
+            <a href="https://rifanarrifki1179-dev.github.io/rumah_adat_sidrap/" class="hotspot" style="top: 30%; left: 53%;">
+              <div class="icon">
+                <img src="assets/icons/sidrap.png" alt="Ikon Sidrap">
+              </div>
+              <div class="label">Rumah Adat Sidrap</div>
+            </a>
+
+            <a href="https://rifanarrifki1179-dev.github.io/rumah_adat_pinrang/" class="hotspot" style="top: 50%; left: 41%;">
+              <div class="icon">
+                <img src="assets/icons/pinrang.png" alt="Ikon Pinrang">
+              </div>
+              <div class="label">Rumah Adat Pinrang</div>
+            </a>
+
+            <a href="https://rifanarrifki1179-dev.github.io/rumah_tradisional_soppeng/" class="hotspot" style="top: 67%; left: 34%;">
+              <div class="icon">
+                <img src="assets/icons/ikon_soppeng.png" alt="Ikon Soppeng">
+              </div>
+              <div class="label">Rumah Adat Soppeng</div>
+            </a>
+
+            <a href="https://rifanarrifki1179-dev.github.io/rumah_adat_bantaeng/" class="hotspot" style="top: 57%; left: 44%;">
+              <div class="icon">
+                <img src="assets/icons/bantaeng.png" alt="Ikon Bantaeng">
+              </div>
+              <div class="label">Rumah Adat Bantaeng</div>
+            </a>
+
+            <a href="https://rifanarrifki1179-dev.github.io/rumah-tradisional-maros/" class="hotspot" style="top: 64%; left: 41%;">
+              <div class="icon">
+                <img src="assets/icons/ikon_maros.png" alt="Ikon Maros">
+              </div>
+              <div class="label">Rumah Adat Maros</div>
+            </a>
+
+            <a href="https://rifanarrifki1179-dev.github.io/Rumah-Adat-Parepare/" class="hotspot" style="top: 71%; left: 38%;">
+              <div class="icon">
+                <img src="assets/icons/parepare.png" alt="Ikon Parepare">
+              </div>
+              <div class="label">Rumah Adat Parepare</div>
+            </a>
+
+            <a href="https://rifanarrifki1179-dev.github.io/rumah_tradisional_bone/" class="hotspot" style="top: 60%; left: 37%;">
+              <div class="icon">
+                <img src="assets/icons/bone.png" alt="Ikon Bone">
+              </div>
+              <div class="label">Rumah Adat Bone</div>
+            </a>
+
+            <a href="https://rifanarrifki1179-dev.github.io/rumah_adat_wajo/" class="hotspot" style="top: 49%; left: 60%;">
+              <div class="icon">
+                <img src="assets/icons/wajo.png" alt="Ikon Wajo">
+              </div>
+              <div class="label">Rumah Adat Wajo</div>
+            </a>
+
+            <a href="https://rifanarrifki1179-dev.github.io/rumah_adat_jeneponto/" class="hotspot" style="top: 28%; left: 48%;">
+              <div class="icon">
+                <img src="assets/icons/jeneponto.png" alt="Ikon Jeneponto">
+              </div>
+              <div class="label">Rumah Adat Jeneponto</div>
+            </a>
+
+            <a href="https://rifanarrifki1179-dev.github.io/rumah_adat_sinjai/" class="hotspot" style="top: 39%; left: 49%;">
+              <div class="icon">
+                <img src="assets/icons/sinjai.png" alt="Ikon Sinjai">
+              </div>
+              <div class="label">Rumah Adat Sinjai</div>
+            </a>
+
+          </div>
+        </div>
+      </div>
+
+      <p id="mapPosition" class="minimap-position">
+        Area 1 dari 3
+      </p>
+    </div>
+  </div>
+</section>
+
+  <main class="py-14 sm:py-16">
+
+    <section id="daftar-rumah" class="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
+      <div class="max-w-3xl mx-auto text-center mb-10 sm:mb-14">
+
+        <h3 class="text-3xl sm:text-4xl font-bold text-zinc-900 mb-4 leading-tight">
+          Eksplorasi Rumah Etnis, Museum, dan Rumah Adat        
+        </h3>
+
+        <p class="text-zinc-600 leading-7 sm:leading-8 text-justify">
+          Benteng Somba Opu menampilkan 4 rumah etnis, 1 museum, serta berbagai rumah adat dan bangunan custom yang dapat dikaji melalui pendekatan budaya dan etnomatematika secara digital. Setiap bangunan mencerminkan karakteristik arsitektur dan nilai budaya lokal yang mengandung konsep-konsep matematika, seperti bentuk geometri, proporsi, dan pola ruang. Melalui media interaktif yang tersedia, pengunjung dapat melakukan eksplorasi sekaligus pembelajaran yang mengintegrasikan aspek budaya dan matematika secara kontekstual.        
+        </div>
+
+      <div class="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-7">
+
+        <article class="house-card">
+          <span class="status-badge status-ready">Selesai</span>
+          <img src="assets/photos/museum.jpeg" alt="Museum Karaeng Pattingngalloang">
+          <div class="p-6">
+            <h4 class="text-xl font-extrabold text-zinc-900 mb-3">Museum Karaeng Pattingngalloang</h4>
+            <p class="text-sm text-zinc-600 leading-7 mb-5">Jelajahi bagian museum sebagai pengantar kawasan budaya Benteng Somba Opu.</p>
+            <a href="https://rifanarrifki1179-dev.github.io/museum_karaeng_pattingngalloang/" class="enter-btn">Masuk</a>
+          </div>
+        </article>
+
+        <article class="house-card">
+          <span class="status-badge status-progress">Proses</span>
+          <img src="assets/photos/ujung-pandang.jpeg" alt="Rumah Adat Ujung Pandang">
+          <div class="p-6">
+            <h4 class="text-xl font-extrabold text-zinc-900 mb-3">Ujung Pandang</h4>
+            <p class="text-sm text-zinc-600 leading-7 mb-5">Balla Labbirinna Ujung Pandang dengan ciri budaya dan bentuk arsitektur lokal.</p>
+            <a href="https://rifanarrifki1179-dev.github.io/balla_labbirina_ujung_pandang/index3.html" class="enter-btn">Masuk</a>
+          </div>
+        </article>
+
+        <article class="house-card">
+          <span class="status-badge status-progress">Proses</span>
+          <img src="assets/photos/majene.jpg" alt="Rumah Adat Majene">
+          <div class="p-6">
+            <h4 class="text-xl font-extrabold text-zinc-900 mb-3">Majene</h4>
+            <p class="text-sm text-zinc-600 leading-7 mb-5">Rumah adat Majene sebagai bagian dari kekayaan budaya kawasan Sulawesi Barat.</p>
+            <a href="https://rifanarrifki1179-dev.github.io/rumah_adat_majene/" class="enter-btn">Masuk</a>
+          </div>
+        </article>
+
+        <article class="house-card">
+          <span class="status-badge status-progress">Proses</span>
+          <img src="assets/photos/mandar.jpg" alt="Rumah Adat Mandar">
+          <div class="p-6">
+            <h4 class="text-xl font-extrabold text-zinc-900 mb-3">Mandar</h4>
+            <p class="text-sm text-zinc-600 leading-7 mb-5">Boyang Mandar dengan bentuk panggung kayu dan nilai budaya masyarakat Mandar.</p>
+            <a href="https://rifanarrifki1179-dev.github.io/rumah_adat_mandar/" class="enter-btn">Masuk</a>
+          </div>
+        </article>
+
+        <article class="house-card">
+          <span class="status-badge status-ready">Selesai</span>
+          <img src="assets/photos/mamuju.png" alt="Rumah Adat Mamuju">
+          <div class="p-6">
+            <h4 class="text-xl font-extrabold text-zinc-900 mb-3">Mamuju</h4>
+            <p class="text-sm text-zinc-600 leading-7 mb-5">Rumah adat Mamuju sebagai representasi budaya dan arsitektur tradisional Sulawesi Barat.</p>
+            <a href="https://rifanarrifki1179-dev.github.io/rumah_adat_mamuju/" class="enter-btn">Masuk</a>
+          </div>
+        </article>
+
+        <article class="house-card">
+          <span class="status-badge status-progress">Proses</span>
+          <img src="assets/photos/kajang.jpg" alt="Rumah Adat Kajang">
+          <div class="p-6">
+            <h4 class="text-xl font-extrabold text-zinc-900 mb-3">Kajang</h4>
+            <p class="text-sm text-zinc-600 leading-7 mb-5">Rumah adat Kajang dengan nilai kesederhanaan, adat, dan keteraturan ruang tradisional.</p>
+            <a href="https://rifanarrifki1179-dev.github.io/rumah_adat_kajang/" class="enter-btn">Masuk</a>
+          </div>
+        </article>
+
+        <article class="house-card">
+          <span class="status-badge status-progress">Proses</span>
+          <img src="assets/photos/baruga.JPG" alt="Rumah Tradisional Baruga">
+          <div class="p-6">
+            <h4 class="text-xl font-extrabold text-zinc-900 mb-3">Baruga</h4>
+            <p class="text-sm text-zinc-600 leading-7 mb-5">Baruga sebagai ruang pertemuan adat dengan fungsi sosial dan budaya masyarakat.</p>
+            <a href="https://rifanarrifki1179-dev.github.io/rumah_tradisional_baruga/" class="enter-btn">Masuk</a>
+          </div>
+        </article>
+
+        <article class="house-card">
+          <span class="status-badge status-ready">Selesai</span>
+          <img src="assets/photos/bulukumba.jpeg" alt="Rumah Adat Bulukumba">
+          <div class="p-6">
+            <h4 class="text-xl font-extrabold text-zinc-900 mb-3">Bulukumba</h4>
+            <p class="text-sm text-zinc-600 leading-7 mb-5">Rumah adat Bulukumba dengan identitas arsitektur lokal dan unsur etnomatematika.</p>
+            <a href="https://rifanarrifki1179-dev.github.io/rumah_adat_bulukumba/" class="enter-btn">Masuk</a>
+          </div>
+        </article>
+
+        <article class="house-card">
+          <span class="status-badge status-progress">Proses</span>
+          <img src="assets/photos/soppeng.jpg" alt="Rumah Adat Soppeng">
+          <div class="p-6">
+            <h4 class="text-xl font-extrabold text-zinc-900 mb-3">Soppeng</h4>
+            <p class="text-sm text-zinc-600 leading-7 mb-5">Rumah adat Soppeng menampilkan struktur rumah panggung Bugis yang khas.</p>
+            <a href="https://rifanarrifki1179-dev.github.io/rumah_adat_soppeng/" class="enter-btn">Masuk</a>
+          </div>
+        </article>
+
+        <article class="house-card">
+          <span class="status-badge status-progress">Proses</span>
+          <img src="assets/photos/luwu.jpg" alt="Rumah Adat Luwu">
+          <div class="p-6">
+            <h4 class="text-xl font-extrabold text-zinc-900 mb-3">Luwu</h4>
+            <p class="text-sm text-zinc-600 leading-7 mb-5">Rumah adat Luwu sebagai warisan arsitektur tradisional dengan nilai historis.</p>
+            <a href="https://rifanarrifki1179-dev.github.io/rumah_adat_luwu/" class="enter-btn">Masuk</a>
+          </div>
+        </article>
+
+        <article class="house-card">
+          <span class="status-badge status-ready">Selesai</span>
+          <img src="assets/photos/toraja.JPG" alt="Rumah Adat Toraja">
+          <div class="p-6">
+            <h4 class="text-xl font-extrabold text-zinc-900 mb-3">Toraja</h4>
+            <p class="text-sm text-zinc-600 leading-7 mb-5">Tongkonan Toraja dengan bentuk atap melengkung dan simbol budaya yang kuat.</p>
+            <a href="https://rifanarrifki1179-dev.github.io/rumah_adat_toraja/" class="enter-btn">Masuk</a>
+          </div>
+        </article>
+
+        <article class="house-card">
+          <span class="status-badge status-progress">Proses</span>
+          <img src="assets/photos/bugis.png" alt="Rumah Adat Bugis">
+          <div class="p-6">
+            <h4 class="text-xl font-extrabold text-zinc-900 mb-3">Bugis</h4>
+            <p class="text-sm text-zinc-600 leading-7 mb-5">Rumah adat Bugis dengan struktur panggung dan keteraturan ruang tradisional.</p>
+            <a href="https://rifanarrifki1179-dev.github.io/rumah_adat_bugis/" class="enter-btn">Masuk</a>
+          </div>
+        </article>
+
+        <article class="house-card">
+          <span class="status-badge status-ready">Selesai</span>
+          <img src="assets/photos/takalar.jpg" alt="Rumah Adat Takalar">
+          <div class="p-6">
+            <h4 class="text-xl font-extrabold text-zinc-900 mb-3">Takalar</h4>
+            <p class="text-sm text-zinc-600 leading-7 mb-5">Rumah adat Takalar memperlihatkan unsur budaya Makassar dan pola geometri bangunan.</p>
+            <a href="https://rifanarrifki1179-dev.github.io/rumah_adat_takalar/" class="enter-btn">Masuk</a>
+          </div>
+        </article>
+
+        <article class="house-card">
+          <span class="status-badge status-ready">Selesai</span>
+          <img src="assets/photos/jeneponto.jpg" alt="Rumah Adat Jeneponto">
+          <div class="p-6">
+            <h4 class="text-xl font-extrabold text-zinc-900 mb-3">Jeneponto</h4>
+            <p class="text-sm text-zinc-600 leading-7 mb-5">Rumah adat Jeneponto sebagai bagian dari identitas budaya masyarakat pesisir selatan.</p>
+            <a href="https://rifanarrifki1179-dev.github.io/rumah_adat_jeneponto/" class="enter-btn">Masuk</a>
+          </div>
+        </article>
+
+        <article class="house-card">
+          <span class="status-badge status-progress">Proses</span>
+          <img src="assets/photos/sidrap.jpg" alt="Rumah Adat Sidrap">
+          <div class="p-6">
+            <h4 class="text-xl font-extrabold text-zinc-900 mb-3">Sidrap</h4>
+            <p class="text-sm text-zinc-600 leading-7 mb-5">Rumah adat Sidrap dapat dikembangkan sebagai media eksplorasi budaya dan matematika.</p>
+            <a href="https://rifanarrifki1179-dev.github.io/rumah_adat_sidrap/" class="enter-btn">Masuk</a>
+          </div>
+        </article>
+
+        <article class="house-card">
+          <span class="status-badge status-ready">Selesai</span>
+          <img src="assets/photos/barru.jpg" alt="Rumah Adat Barru">
+          <div class="p-6">
+            <h4 class="text-xl font-extrabold text-zinc-900 mb-3">Barru</h4>
+            <p class="text-sm text-zinc-600 leading-7 mb-5">Rumah adat Barru menghadirkan bentuk arsitektur tradisional Bugis yang khas.</p>
+            <a href="https://rifanarrifki1179-dev.github.io/rumah_adat_barru/" class="enter-btn">Masuk</a>
+          </div>
+        </article>
+
+        <article class="house-card">
+          <span class="status-badge status-progress">Proses</span>
+          <img src="assets/photos/selayar.jpg" alt="Rumah Adat Selayar">
+          <div class="p-6">
+            <h4 class="text-xl font-extrabold text-zinc-900 mb-3">Selayar</h4>
+            <p class="text-sm text-zinc-600 leading-7 mb-5">Rumah adat Selayar menampilkan karakter budaya kepulauan dan bentuk rumah panggung.</p>
+            <a href="https://rifanarrifki1179-dev.github.io/rumah_adat_selayar/" class="enter-btn">Masuk</a>
+          </div>
+        </article>
+
+        <article class="house-card">
+          <span class="status-badge status-ready">Selesai</span>
+          <img src="assets/photos/sinjai.jpg" alt="Rumah Adat Sinjai">
+          <div class="p-6">
+            <h4 class="text-xl font-extrabold text-zinc-900 mb-3">Sinjai</h4>
+            <p class="text-sm text-zinc-600 leading-7 mb-5">Rumah adat Sinjai menonjolkan bentuk rumah panggung dan nilai budaya lokal.</p>
+            <a href="https://rifanarrifki1179-dev.github.io/rumah_adat_sinjai/" class="enter-btn">Masuk</a>
+          </div>
+        </article>
+
+        <article class="house-card">
+          <span class="status-badge status-ready">Selesai</span>
+          <img src="assets/photos/pinrang.jpg" alt="Rumah Adat Pinrang">
+          <div class="p-6">
+            <h4 class="text-xl font-extrabold text-zinc-900 mb-3">Pinrang</h4>
+            <p class="text-sm text-zinc-600 leading-7 mb-5">Rumah adat Pinrang sebagai bagian dari keragaman arsitektur tradisional Sulawesi Selatan.</p>
+            <a href="https://rifanarrifki1179-dev.github.io/rumah_adat_pinrang/" class="enter-btn">Masuk</a>
+          </div>
+        </article>
+
+        <article class="house-card">
+          <span class="status-badge status-progress">Proses</span>
+          <img src="assets/photos/bone.jpg" alt="Rumah Adat Bone">
+          <div class="p-6">
+            <h4 class="text-xl font-extrabold text-zinc-900 mb-3">Bone</h4>
+            <p class="text-sm text-zinc-600 leading-7 mb-5">Rumah adat Bone mencerminkan kekayaan budaya Bugis dan struktur sosial masyarakatnya.</p>
+            <a href="https://rifanarrifki1179-dev.github.io/rumah_adat_bone/" class="enter-btn">Masuk</a>
+          </div>
+        </article>
+
+        <article class="house-card">
+          <span class="status-badge status-ready">Selesai</span>
+          <img src="assets/photos/bantaeng.jpg" alt="Rumah Adat Bantaeng">
+          <div class="p-6">
+            <h4 class="text-xl font-extrabold text-zinc-900 mb-3">Bantaeng</h4>
+            <p class="text-sm text-zinc-600 leading-7 mb-5">Rumah adat Bantaeng menghadirkan unsur budaya, geometri, dan kearifan lokal.</p>
+            <a href="https://rifanarrifki1179-dev.github.io/rumah_adat_bantaeng/" class="enter-btn">Masuk</a>
+          </div>
+        </article>
+
+        <article class="house-card">
+          <span class="status-badge status-progress">Proses</span>
+          <img src="assets/photos/maros.jpg" alt="Rumah Adat Maros">
+          <div class="p-6">
+            <h4 class="text-xl font-extrabold text-zinc-900 mb-3">Maros</h4>
+            <p class="text-sm text-zinc-600 leading-7 mb-5">Rumah adat Maros memperlihatkan bentuk panggung dan keteraturan ruang tradisional.</p>
+            <a href="https://rifanarrifki1179-dev.github.io/rumah_adat_maros/" class="enter-btn">Masuk</a>
+          </div>
+        </article>
+
+        <article class="house-card">
+          <span class="status-badge status-progress">Proses</span>
+          <img src="assets/photos/parepare.jpg" alt="Rumah Adat Parepare">
+          <div class="p-6">
+            <h4 class="text-xl font-extrabold text-zinc-900 mb-3">Parepare</h4>
+            <p class="text-sm text-zinc-600 leading-7 mb-5">Rumah adat Parepare menjadi bagian dari eksplorasi budaya dan visualisasi matematika.</p>
+            <a href="https://rifanarrifki1179-dev.github.io/rumah_adat_parepare/" class="enter-btn">Masuk</a>
+          </div>
+        </article>
+
+        <article class="house-card">
+          <span class="status-badge status-ready">Selesai</span>
+          <img src="assets/photos/wajo.jpg" alt="Rumah Adat Wajo">
+          <div class="p-6">
+            <h4 class="text-xl font-extrabold text-zinc-900 mb-3">Wajo</h4>
+            <p class="text-sm text-zinc-600 leading-7 mb-5">Rumah adat Wajo menampilkan identitas Bugis dan konsep ruang tradisional.</p>
+            <a href="https://rifanarrifki1179-dev.github.io/rumah_adat_wajo/" class="enter-btn">Masuk</a>
+          </div>
+        </article>
+
+      </div>
+    </section>
+
+    <section id="tentang" class="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8 mt-20">
+      <div class="rounded-[30px] border border-amber-100 bg-white p-8 shadow-sm max-w-4xl mx-auto">
+        <p class="text-sm uppercase tracking-[0.2em] text-amber-700 mb-3">
+          Tentang Website
+        </p>
+
+        <h3 class="text-3xl sm:text-4xl font-bold text-zinc-900 mb-5 leading-tight">
+          Media Eksplorasi Rumah Adat Berbasis Digital
+        </h3>
+
+        <p class="text-zinc-600 leading-7 sm:leading-8 mb-5 text-justify">
+          Halaman main menu ini berfungsi sebagai pusat navigasi utama untuk mengakses seluruh rumah adat dalam website Benteng Somba Opu. Dengan tampilan card yang tersusun rapi, pengunjung dapat memilih rumah adat tertentu tanpa harus menggunakan map terlebih dahulu.
+        </p>
+
+        <p class="text-zinc-600 leading-7 sm:leading-8 text-justify">
+          Setiap halaman rumah adat dapat dikembangkan dengan fitur tur virtual 360°, artikel matematika, projective geometry, desain 3D, dan video drone. Dengan demikian, website ini tidak hanya menjadi media informasi budaya, tetapi juga media pembelajaran berbasis etnomatematika.
+        </p>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="mt-20 bg-zinc-900 text-zinc-300">
+    <div class="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8 py-8 flex flex-col md:flex-row justify-between gap-3 text-sm">
+      <p>© 2025 · Website Interaktif Benteng Somba Opu</p>
+
+      <p>
+        <a
+          href="https://rifanarrifki1179-dev.github.io/benteng_somba_opu/"
+          target="_blank"
+          class="text-amber-400 hover:text-amber-300 underline underline-offset-4 transition"
+        >
+          benteng somba opu
+        </a>
+      </p>
+    </div>
+  </footer>
+
+  <div id="pageOverlay" class="page-overlay"></div>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const body = document.body;
+      const overlay = document.getElementById("pageOverlay");
+
+      const menuBtn = document.getElementById("menuBtn");
+      const menuIcon = document.getElementById("menuIcon");
+      const mobileMenu = document.getElementById("mobileMenu");
+      const menuBackdrop = document.getElementById("menuBackdrop");
+
+      function closeMenu() {
+        if (!mobileMenu || !menuBackdrop || !menuIcon) return;
+
+        mobileMenu.classList.remove("open");
+        menuBackdrop.classList.remove("open");
+        body.classList.remove("menu-open");
+        menuIcon.classList.remove("active");
+      }
+
+      if (menuBtn && mobileMenu && menuIcon && menuBackdrop) {
+        menuBtn.addEventListener("click", (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+
+          mobileMenu.classList.toggle("open");
+          menuBackdrop.classList.toggle("open");
+          body.classList.toggle("menu-open");
+          menuIcon.classList.toggle("active");
+        });
+
+        menuBackdrop.addEventListener("click", closeMenu);
+
+        document.querySelectorAll(".menu-link").forEach(link => {
+          link.addEventListener("click", closeMenu);
+        });
+      }
+
+      const links = document.querySelectorAll('a[href]:not([href^="#"]):not([target="_blank"])');
+
+      links.forEach(link => {
+        link.addEventListener("click", function (e) {
+          const href = this.getAttribute("href");
+
+          if (!href || href === "#" || href.startsWith("javascript:")) return;
+
+          e.preventDefault();
+
+          body.classList.add("is-leaving");
+
+          if (overlay) {
+            overlay.classList.add("is-active");
+          }
+
+          setTimeout(() => {
+            window.location.href = href;
+          }, 420);
+        });
+      });
+
+      window.addEventListener("pageshow", () => {
+        body.classList.remove("is-leaving");
+        body.classList.remove("menu-open");
+
+        if (overlay) {
+          overlay.classList.remove("is-active");
+        }
+
+        if (menuIcon) {
+          menuIcon.classList.remove("active");
+        }
+      });
+    });
+  </script>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  document.querySelectorAll(".scroll-to-section").forEach(link => {
+    link.addEventListener("click", function (e) {
+      e.preventDefault();
+
+      const target = document.querySelector(this.getAttribute("href"));
+      if (!target) return;
+
+      const headerOffset = 90;
+      const targetPosition = target.getBoundingClientRect().top + window.pageYOffset - headerOffset;
+      const startPosition = window.pageYOffset;
+      const distance = targetPosition - startPosition;
+      const duration = 900;
+      let startTime = null;
+
+      function easeInOutCubic(t) {
+        return t < 0.5
+          ? 4 * t * t * t
+          : 1 - Math.pow(-2 * t + 2, 3) / 2;
+      }
+
+      function animation(currentTime) {
+        if (startTime === null) startTime = currentTime;
+
+        const timeElapsed = currentTime - startTime;
+        const progress = Math.min(timeElapsed / duration, 1);
+        const ease = easeInOutCubic(progress);
+
+        window.scrollTo(0, startPosition + distance * ease);
+
+        if (timeElapsed < duration) {
+          requestAnimationFrame(animation);
+        } else {
+          target.classList.remove("section-slide-active");
+
+          setTimeout(() => {
+            target.classList.add("section-slide-active");
+          }, 80);
+        }
+      }
+
+      requestAnimationFrame(animation);
+    });
+  });
+});
+</script>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const minimapTrack = document.getElementById("minimapTrack");
+  const mapPosition = document.getElementById("mapPosition");
+  const btnLeft = document.getElementById("mapLeft");
+  const btnRight = document.getElementById("mapRight");
+
+  let index = 0;
+  const totalMap = 3;
+
+  function updateMinimap() {
+    if (!minimapTrack || !btnLeft || !btnRight) return;
+
+    minimapTrack.style.transform = `translateX(-${index * 100}%)`;
+
+    if (mapPosition) {
+      mapPosition.textContent = `Area ${index + 1} dari ${totalMap}`;
+    }
+
+    btnLeft.disabled = index === 0;
+    btnRight.disabled = index === totalMap - 1;
+  }
+
+  btnLeft.addEventListener("click", () => {
+    if (index > 0) {
+      index--;
+      updateMinimap();
+    }
+  });
+
+  btnRight.addEventListener("click", () => {
+    if (index < totalMap - 1) {
+      index++;
+      updateMinimap();
+    }
+  });
+
+  updateMinimap();
+});
+</script>
+
+</body>
+</html>

@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>About — Benteng Somba Opu</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <style>
+    @keyframes pageEnter {
+      from {
+        opacity: 0;
+        transform: translateY(35px) scale(0.98);
+        filter: blur(3px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+        filter: blur(0);
+      }
+    }
+
+    @keyframes pageLeave {
+      from {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+        filter: blur(0);
+      }
+      to {
+        opacity: 0;
+        transform: translateY(-35px) scale(0.98);
+        filter: blur(3px);
+      }
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      min-height: 100vh;
+    }
+
+    body.menu-open {
+      overflow: hidden;
+    }
+
+    .page-transition {
+      animation: pageEnter 650ms ease both;
+    }
+
+    .page-transition.is-leaving {
+      animation: pageLeave 450ms ease both;
+    }
+
+    .page-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(24, 24, 27, 0);
+      pointer-events: none;
+      transition: background 450ms ease;
+      z-index: 9999;
+    }
+
+    .page-overlay.is-active {
+      background: rgba(24, 24, 27, 0.22);
+    }
+
+    .pressable {
+      transition: transform 180ms ease, box-shadow 180ms ease;
+    }
+
+    .pressable:active {
+      transform: scale(0.97);
+    }
+
+    .logo-box {
+      width: 54px;
+      height: 54px;
+      border-radius: 16px;
+      background: rgba(255, 255, 255, 0.88);
+      border: 1px solid rgba(245, 158, 11, 0.35);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 7px;
+      box-shadow: 0 8px 24px rgba(120, 53, 15, 0.12);
+      flex-shrink: 0;
+    }
+
+    .logo-box img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      display: block;
+    }
+
+    .menu-burger,
+    .menu-burger::before,
+    .menu-burger::after {
+      display: block;
+      width: 24px;
+      height: 3px;
+      border-radius: 999px;
+      background: #3f2a12;
+      transition: transform 300ms ease, opacity 300ms ease, background 300ms ease, top 300ms ease;
+    }
+
+    .menu-burger {
+      position: relative;
+    }
+
+    .menu-burger::before,
+    .menu-burger::after {
+      content: "";
+      position: absolute;
+      left: 0;
+    }
+
+    .menu-burger::before {
+      top: -8px;
+    }
+
+    .menu-burger::after {
+      top: 8px;
+    }
+
+    .menu-burger.active {
+      background: transparent;
+    }
+
+    .menu-burger.active::before {
+      top: 0;
+      transform: rotate(45deg);
+    }
+
+    .menu-burger.active::after {
+      top: 0;
+      transform: rotate(-45deg);
+    }
+
+    .side-menu {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 300px;
+      height: 100vh;
+      padding: 110px 24px 24px;
+      background: #f7f1e8;
+      border-right: 1px solid rgba(245, 158, 11, 0.35);
+      box-shadow: 20px 0 50px rgba(120, 53, 15, 0.12);
+      transform: translateX(-100%);
+      transition: transform 350ms ease;
+      z-index: 48;
+      overflow-y: auto;
+    }
+
+    .side-menu.open {
+      transform: translateX(0);
+    }
+
+    .menu-link {
+      display: block;
+      padding: 14px 16px;
+      border-radius: 14px;
+      transition: background 250ms ease, color 250ms ease, transform 250ms ease;
+    }
+
+    .menu-link:hover {
+      background: #fef3c7;
+      color: #92400e;
+      transform: translateX(4px);
+    }
+
+    .menu-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(24, 24, 27, 0);
+      pointer-events: none;
+      transition: background 350ms ease;
+      z-index: 40;
+    }
+
+    .menu-backdrop.open {
+      background: rgba(24, 24, 27, 0.22);
+      pointer-events: auto;
+    }
+
+    article p,
+    main p {
+      text-align: justify;
+      text-justify: inter-word;
+    }
+
+    .about-card {
+      border-radius: 32px;
+      border: 1px solid rgba(245, 158, 11, 0.35);
+      background: rgba(255, 255, 255, 0.96);
+      box-shadow: 0 24px 70px rgba(120, 53, 15, 0.14);
+    }
+
+    .info-card {
+      border-radius: 24px;
+      border: 1px solid rgba(245, 158, 11, 0.28);
+      background: #fffaf3;
+      box-shadow: 0 14px 34px rgba(120, 53, 15, 0.08);
+    }
+
+    .tag-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border-radius: 999px;
+      border: 1px solid rgba(180, 83, 9, 0.25);
+      background: #fef3c7;
+      padding: 7px 14px;
+      color: #92400e;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+    }
+
+    .divider-gradient {
+      height: 1px;
+      width: 100%;
+      background: linear-gradient(
+        to right,
+        transparent,
+        rgba(180, 83, 9, 0.45),
+        transparent
+      );
+    }
+
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: #92400e;
+      font-weight: 800;
+      transition: color 250ms ease, transform 250ms ease;
+    }
+
+    .back-link:hover {
+      color: #78350f;
+      transform: translateX(-4px);
+    }
+
+    @media (max-width: 640px) {
+      .side-menu {
+        width: 260px;
+        padding: 105px 20px 24px;
+      }
+
+      .logo-box {
+        width: 48px;
+        height: 48px;
+      }
+    }
+
+    @media (max-width: 420px) {
+      header .logo-box {
+        width: 42px;
+        height: 42px;
+        border-radius: 13px;
+      }
+    }
+  </style>
+</head>
+
+<body class="bg-[#f7f1e8] text-zinc-800 antialiased page-transition">
+
+  <!-- NAVBAR -->
+  <header class="sticky top-0 z-50 border-b border-amber-200/70 bg-[#f7f1e8]/95 backdrop-blur-md shadow-sm">
+    <div class="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8 py-3 flex items-center justify-between gap-5">
+
+      <div class="flex items-center gap-4 min-w-0">
+        <button
+          id="menuBtn"
+          type="button"
+          class="pressable inline-flex h-11 w-11 items-center justify-center rounded-xl border border-amber-200 bg-white/85 text-zinc-800 shadow-sm hover:bg-amber-100 transition relative z-50 flex-shrink-0"
+          aria-label="Buka menu"
+        >
+          <span id="menuIcon" class="menu-burger" aria-hidden="true"></span>
+        </button>
+
+        <div class="min-w-0">
+          <h1 class="text-base sm:text-xl font-extrabold text-zinc-900 leading-tight truncate">
+            Benteng Somba Opu
+          </h1>
+          <p class="text-[10px] sm:text-xs tracking-[0.2em] text-amber-700 uppercase truncate">
+            Website Rumah Adat
+          </p>
+        </div>
+      </div>
+
+      <div class="logo-box">
+        <img src="assets/photos/logo.png" alt="Logo Benteng Somba Opu">
+      </div>
+
+    </div>
+  </header>
+
+  <!-- SIDE MENU -->
+  <div id="menuBackdrop" class="menu-backdrop"></div>
+
+  <aside id="mobileMenu" class="side-menu">
+    <nav class="flex flex-col gap-3 text-sm font-semibold text-zinc-700">
+      <a href="mainmenu.html" class="menu-link">Beranda</a>
+      <a href="mainmenu.html#daftar-rumah" class="menu-link">Jelajah Kawasan</a>
+      <a href="mainmenu.html#tentang" class="menu-link">Tentang Website</a>
+      <a href="about.html" class="menu-link">Informasi Benteng Somba Opu</a>
+      <a href="drone.html" class="menu-link">Video Drone Benteng Somba Opu</a>
+    </nav>
+  </aside>
+
+  <!-- CONTENT ABOUT -->
+  <main class="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8 py-10 sm:py-14">
+
+    <a href="mainmenu.html" class="back-link mb-7">
+      <span class="text-lg">←</span>
+      <span>Kembali ke Beranda</span>
+    </a>
+
+    <section class="about-card p-6 sm:p-8 lg:p-10">
+      <div class="mb-7">
+        <div class="tag-pill mb-5">
+          <span class="inline-flex h-2 w-2 rounded-full bg-amber-700"></span>
+          Jelajah Sejarah · Benteng Somba Opu
+        </div>
+
+        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-zinc-900 leading-tight mb-4">
+          Benteng Somba Opu:
+          <span class="text-amber-700">Bandar Transit di Kawasan Timur Nusantara</span>
+        </h2>
+
+        <p class="text-zinc-600 leading-7 sm:leading-8 max-w-3xl">
+          Sebuah ruang refleksi sejarah yang merekam kejayaan maritim Kerajaan Gowa,
+          jalur perdagangan rempah, dan jejak perjuangan mempertahankan kedaulatan
+          di abad ke-17.
+        </p>
+      </div>
+
+      <div class="divider-gradient mb-8"></div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-[minmax(0,3fr)_minmax(320px,1.25fr)] gap-8 lg:gap-10">
+
+        <!-- NARASI UTAMA -->
+        <article class="space-y-5 text-sm sm:text-[15px] leading-8 text-zinc-700">
+          <p>
+            <span class="font-bold text-amber-800">Benteng Somba Opu</span> adalah saksi bisu kejayaan besar
+            Kerajaan Gowa, salah satu kerajaan maritim paling berpengaruh di kawasan timur Nusantara.
+            Pada masa pemerintahan Sultan Alauddin, Raja Gowa ke-XIV, kerajaan ini mulai menunjukkan
+            kekuatan dan pengaruhnya dengan memperluas wilayah hingga ke kepulauan Nusa Tenggara.
+            Jaringan kekuasaan dan aktivitas perdagangan berkembang pesat, memantapkan posisi Gowa
+            sebagai pusat ekonomi dan politik yang strategis.
+          </p>
+
+          <p>
+            Puncak kejayaan Gowa–Tallo terjadi pada masa
+            <span class="font-bold text-zinc-900">Sultan Hasanuddin (1653–1669)</span>, sosok yang dikenal karena
+            keberanian dan ketegasannya dalam mempertahankan kedaulatan negeri. Di bawah pemerintahannya,
+            Kerajaan Gowa menjelma menjadi kerajaan maritim yang menguasai jalur perdagangan utama di
+            Kawasan Timur Nusantara. Letak Benteng Somba Opu yang sangat strategis menjadikannya sebagai
+            pusat aktivitas, yakni bandar transit penting dalam perdagangan rempah-rempah sekaligus gerbang
+            penghubung antara Malaka, Jawa, dan Maluku.
+          </p>
+
+          <p>
+            Posisi kuat Gowa ini pada akhirnya memicu ketegangan dengan
+            <span class="font-semibold text-amber-800">VOC (Vereenigde Oostindische Compagnie)</span> yang berambisi
+            memonopoli perdagangan rempah di wilayah timur. Saat monopoli itu dipaksakan, konflik besar pun
+            tak terhindarkan. Pada tahun 1666, VOC mengirim armada perang ke Makassar dan pertempuran sengit
+            antara pasukan Gowa dan kekuatan kolonial berkecamuk di kawasan ini.
+          </p>
+
+          <p>
+            Meskipun Sultan Hasanuddin memberikan perlawanan yang luar biasa, Gowa akhirnya terpaksa
+            menandatangani <span class="font-semibold text-zinc-900">Perjanjian Bungaya pada 18 September 1667</span>,
+            yang menandai berakhirnya perang dan menggeser peta kekuatan politik di kawasan timur Nusantara.
+            Dua tahun kemudian, tepatnya pada 1669, Benteng Somba Opu dihancurkan. Sejak saat itu,
+            kemegahan yang pernah menaungi kawasan ini perlahan memudar, menyisakan puing-puing struktur
+            benteng yang kini tak lagi utuh.
+          </p>
+
+          <p>
+            Walau demikian, sisa-sisa bangunan yang masih berdiri menjadi pengingat bahwa Somba Opu pernah
+            menjadi salah satu bandar niaga terbesar dan paling berpengaruh di Asia Tenggara pada abad ke-17.
+            Di antara batu-batu tua dan bekas dinding yang runtuh, tersimpan kisah tentang gemuruh perdagangan
+            rempah, kesibukan para pelaut, serta perjuangan gigih rakyat Gowa mempertahankan tanah airnya.
+          </p>
+
+          <p>
+            Hari ini, Benteng Somba Opu menjadi
+            <span class="font-bold text-amber-800">ruang refleksi sejarah</span>, tempat pengunjung bisa membayangkan
+            kembali denyut kehidupan masa lalu sekaligus merenungkan makna perjuangan dan kedaulatan.
+            Melestarikan situs ini berarti menjaga identitas, kebanggaan, dan memori kejayaan bangsa.
+          </p>
+
+          <div class="rounded-2xl border border-amber-200 bg-amber-50 p-5 text-zinc-700 shadow-sm">
+            <p class="text-xs font-extrabold uppercase tracking-[0.18em] text-amber-700 mb-2">
+              Ajakan
+            </p>
+            <p class="leading-7">
+              Mari bersama merawat jejak sejarah Kerajaan Gowa, agar kemegahan Benteng Somba Opu tidak hanya
+              dikenang sebagai nama dalam buku, tetapi hidup dalam ingatan dan karakter generasi yang akan datang.
+            </p>
+          </div>
+        </article>
+
+        <!-- INFO SAMPING -->
+        <aside class="space-y-5 text-xs sm:text-sm">
+
+          <div class="info-card p-5 sm:p-6">
+            <div class="flex items-center gap-3 mb-5">
+              <div class="h-10 w-10 rounded-full bg-amber-100 flex items-center justify-center">
+                <span class="text-amber-700 text-xl">⛵</span>
+              </div>
+              <h3 class="text-lg font-extrabold text-zinc-900">
+                Sekilas Kronologi
+              </h3>
+            </div>
+
+            <ul class="space-y-4 text-zinc-600 leading-6">
+              <li class="flex gap-3">
+                <span class="mt-2 h-2 w-2 rounded-full bg-amber-700 flex-shrink-0"></span>
+                <span>
+                  <span class="font-bold text-zinc-900">Masa Sultan Alauddin</span> — perluasan pengaruh
+                  Kerajaan Gowa hingga ke kepulauan Nusa Tenggara dan penguatan jaringan perdagangan.
+                </span>
+              </li>
+
+              <li class="flex gap-3">
+                <span class="mt-2 h-2 w-2 rounded-full bg-amber-700 flex-shrink-0"></span>
+                <span>
+                  <span class="font-bold text-zinc-900">1653–1669</span> — masa pemerintahan Sultan Hasanuddin;
+                  Gowa–Tallo mencapai puncak kejayaan.
+                </span>
+              </li>
+
+              <li class="flex gap-3">
+                <span class="mt-2 h-2 w-2 rounded-full bg-amber-700 flex-shrink-0"></span>
+                <span>
+                  <span class="font-bold text-zinc-900">1666</span> — VOC mengirim armada ke Makassar.
+                </span>
+              </li>
+
+              <li class="flex gap-3">
+                <span class="mt-2 h-2 w-2 rounded-full bg-amber-700 flex-shrink-0"></span>
+                <span>
+                  <span class="font-bold text-zinc-900">18 September 1667</span> — Perjanjian Bungaya ditandatangani.
+                </span>
+              </li>
+
+              <li class="flex gap-3">
+                <span class="mt-2 h-2 w-2 rounded-full bg-amber-700 flex-shrink-0"></span>
+                <span>
+                  <span class="font-bold text-zinc-900">1669</span> — Benteng Somba Opu dihancurkan.
+                </span>
+              </li>
+            </ul>
+          </div>
+
+          <div class="overflow-hidden rounded-3xl border border-amber-200 bg-white shadow-lg">
+            <img
+              src="assets/photos/benteng_dashboard.jpg"
+              alt="Benteng Somba Opu"
+              class="w-full h-auto object-cover"
+            />
+            <div class="p-4">
+              <p class="text-xs text-zinc-500 leading-6">
+                Dokumentasi visual kawasan Benteng Somba Opu sebagai ruang sejarah, budaya,
+                dan edukasi digital.
+              </p>
+            </div>
+          </div>
+
+        </aside>
+      </div>
+    </section>
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="mt-20 bg-zinc-900 text-zinc-300">
+    <div class="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8 py-8 flex flex-col md:flex-row justify-between gap-3 text-sm">
+      <p>© 2025 · Website Interaktif Benteng Somba Opu</p>
+
+      <p>
+        <a
+          href="https://rifanarrifki1179-dev.github.io/benteng_somba_opu/"
+          target="_blank"
+          class="text-amber-400 hover:text-amber-300 underline underline-offset-4 transition"
+        >
+          benteng somba opu
+        </a>
+      </p>
+    </div>
+  </footer>
+
+  <div id="pageOverlay" class="page-overlay"></div>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const body = document.body;
+      const overlay = document.getElementById("pageOverlay");
+
+      const menuBtn = document.getElementById("menuBtn");
+      const menuIcon = document.getElementById("menuIcon");
+      const mobileMenu = document.getElementById("mobileMenu");
+      const menuBackdrop = document.getElementById("menuBackdrop");
+
+      function closeMenu() {
+        if (!mobileMenu || !menuBackdrop || !menuIcon) return;
+
+        mobileMenu.classList.remove("open");
+        menuBackdrop.classList.remove("open");
+        body.classList.remove("menu-open");
+        menuIcon.classList.remove("active");
+      }
+
+      if (menuBtn && mobileMenu && menuIcon && menuBackdrop) {
+        menuBtn.addEventListener("click", (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+
+          mobileMenu.classList.toggle("open");
+          menuBackdrop.classList.toggle("open");
+          body.classList.toggle("menu-open");
+          menuIcon.classList.toggle("active");
+        });
+
+        menuBackdrop.addEventListener("click", closeMenu);
+
+        document.querySelectorAll(".menu-link").forEach(link => {
+          link.addEventListener("click", closeMenu);
+        });
+      }
+
+      const links = document.querySelectorAll('a[href]:not([href^="#"]):not([target="_blank"])');
+
+      links.forEach(link => {
+        link.addEventListener("click", function (e) {
+          const href = this.getAttribute("href");
+
+          if (!href || href === "#" || href.startsWith("javascript:")) return;
+
+          e.preventDefault();
+
+          body.classList.add("is-leaving");
+
+          if (overlay) {
+            overlay.classList.add("is-active");
+          }
+
+          setTimeout(() => {
+            window.location.href = href;
+          }, 420);
+        });
+      });
+
+      window.addEventListener("pageshow", () => {
+        body.classList.remove("is-leaving");
+        body.classList.remove("menu-open");
+
+        if (overlay) {
+          overlay.classList.remove("is-active");
+        }
+
+        if (menuIcon) {
+          menuIcon.classList.remove("active");
+        }
+      });
+    });
+  </script>
+
+</body>
+</html>
